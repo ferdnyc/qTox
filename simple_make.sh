@@ -87,20 +87,18 @@ dnf_install() {
         glib2-devel
         gtk2-devel
         libsodium-devel
-        libtool
         libvpx-devel
         libXScrnSaver-devel
         openal-soft-devel
         openssl-devel
         opus-devel
         qrencode-devel
-        qtsingleapplication-qt5
         qt5-devel
+        qt5-qtdoc
         qt5-qtsvg
         qt5-qtsvg-devel
         qt5-qttools-devel
-        qt-creator
-        qt-doc
+        qtsingleapplication-qt5
         sqlcipher-devel
     )
     sudo dnf install "${dnf_packages[@]}"
