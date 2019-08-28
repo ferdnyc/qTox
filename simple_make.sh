@@ -94,12 +94,14 @@ dnf_install() {
         openssl-devel
         opus-devel
         qrencode-devel
+        qtsingleapplication-qt5
+        qt5-devel
         qt5-qtsvg
         qt5-qtsvg-devel
         qt5-qttools-devel
         qt-creator
-        qt-devel
         qt-doc
+        sqlcipher-devel
     )
     sudo dnf install "${dnf_packages[@]}"
 }
