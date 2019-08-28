@@ -71,14 +71,14 @@ dnf_install() {
         'Development Tools'
         'C Development Tools and Libraries'
     )
-    sudo dnf group install "${dnf_group_packages[@]}"
+    sudo dnf -y group install "${dnf_group_packages[@]}"
 
     # pure Fedora doesn't have what it takes to compile qTox (ffmpeg)
-    local fedora_version=$(rpm -E %fedora)
+    local fedora_version=rawhide
     local dnf_rpmfusion_package=(
         http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$fedora_version.noarch.rpm
     )
-    sudo dnf install "$dnf_rpmfusion_package"
+    sudo dnf -y install "$dnf_rpmfusion_package"
 
     local dnf_packages=(
         ffmpeg-devel
@@ -86,6 +86,9 @@ dnf_install() {
         git
         glib2-devel
         gtk2-devel
+	kf5-sonnet-devel
+	libconfig-devel
+	libexif-devel
         libsodium-devel
         libvpx-devel
         libXScrnSaver-devel
@@ -99,25 +102,29 @@ dnf_install() {
         qt5-qtsvg-devel
         qt5-qttools-devel
         qtsingleapplication-qt5
+	readline-devel
         sqlcipher-devel
+	tcl-devel
     )
-    sudo dnf install "${dnf_packages[@]}"
+    sudo dnf -y install "${dnf_packages[@]}"
 }
 
 # Fedora by default doesn't include libs in /usr/local/lib so add it
 fedora_locallib() {
     local llib_file="/etc/ld.so.conf.d/locallib.conf"
-    local llib_line="/usr/local/lib/"
+    local llib_lines=("/usr/local/lib/" "/usr/local/lib64/")
 
     # check whether needed line already exists
     is_locallib() {
-        grep -q "^$llib_line\$" "$llib_file"
+        grep -q "^$1\$" "$llib_file"
     }
 
-    # proceed only if line doesn't exist
-    is_locallib \
-        || echo "$llib_line" \
-            | sudo tee -a "$llib_file"
+    # add each line only if it doesn't exist
+    for llib_line in "${llib_lines[@]}"; do\
+        is_locallib "$llib_line" \
+       	    || echo "$llib_line" \
+                | sudo tee -a "$llib_file";
+    done
 }
 
 zypper_install() {
@@ -166,6 +173,7 @@ main() {
     then
         dnf_install
         fedora_locallib
+	export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig"
     else
         echo "Unknown package manager, attempting to compile anyways"
     fi
