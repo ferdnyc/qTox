@@ -104,7 +104,6 @@ dnf_install() {
         qtsingleapplication-qt5
 	readline-devel
         sqlcipher-devel
-	tcl-devel
     )
     sudo dnf -y install "${dnf_packages[@]}"
 }
@@ -160,6 +159,7 @@ zypper_install() {
 }
 
 main() {
+    local BOOTSTRAP_ARGS=""
     if command -v zypper && [ -f /etc/products.d/openSUSE.prod ]
     then
         zypper_install
@@ -174,11 +174,12 @@ main() {
         dnf_install
         fedora_locallib
 	export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig"
+	BOOTSTRAP_ARGS="--without-sqlcipher"
     else
         echo "Unknown package manager, attempting to compile anyways"
     fi
 
-    ./bootstrap.sh
+    ./bootstrap.sh ${BOOTSTRAP_ARGS}
     mkdir -p _build
     cd _build
     cmake ../
